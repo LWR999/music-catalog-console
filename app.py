@@ -56,6 +56,16 @@ def albums():
     search = request.args.get('search', '').strip()
     genre_id = request.args.get('genre_id', '').strip()
     compilation = request.args.get('compilation', '').strip()
+    sort = request.args.get('sort', 'artist').strip()
+
+    sort_map = {
+        'artist':   'ar.sort_name, a.year, a.title',
+        'title':    'a.title, ar.sort_name',
+        'year_desc':'a.year DESC NULLS LAST, ar.sort_name, a.title',
+        'year_asc': 'a.year ASC NULLS LAST, ar.sort_name, a.title',
+        'added':    'a.last_scraped DESC NULLS LAST, ar.sort_name, a.title',
+    }
+    order_by = sort_map.get(sort, sort_map['artist'])
 
     conditions = []
     params = []
@@ -101,7 +111,7 @@ def albums():
         JOIN artists ar ON ar.id = a.artist_id
         JOIN formats  f  ON  f.id = a.format_id
         {where}
-        ORDER BY ar.sort_name, a.year, a.title
+        ORDER BY {order_by}
         LIMIT %s OFFSET %s
         """,
         params + [per_page, offset],
@@ -224,4 +234,4 @@ def scrape(mode):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001, threaded=True)
+    app.run(host='0.0.0.0', port=5001, debug=True, threaded=True)

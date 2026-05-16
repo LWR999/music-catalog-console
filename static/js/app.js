@@ -6,7 +6,7 @@ const state = {
   page: 1,
   total: 0,
   loading: false,
-  filters: { search: '', genre_id: '', compilation: false },
+  filters: { search: '', genre_id: '', compilation: false, sort: 'artist' },
   scrapeSource: null,
 };
 
@@ -52,6 +52,7 @@ function buildQuery() {
   if (state.filters.search)   p.set('search', state.filters.search);
   if (state.filters.genre_id) p.set('genre_id', state.filters.genre_id);
   if (state.filters.compilation) p.set('compilation', 'true');
+  if (state.filters.sort) p.set('sort', state.filters.sort);
   return p.toString();
 }
 
@@ -390,12 +391,19 @@ document.addEventListener('DOMContentLoaded', () => {
     resetAndLoad();
   });
 
+  // Sort
+  document.getElementById('sort-select').addEventListener('change', e => {
+    state.filters.sort = e.target.value;
+    resetAndLoad();
+  });
+
   // Clear filters
   document.getElementById('btn-clear-filters').addEventListener('click', () => {
-    state.filters = { search: '', genre_id: '', compilation: false };
-    document.getElementById('search').value           = '';
-    document.getElementById('genre-filter').value     = '';
+    state.filters = { search: '', genre_id: '', compilation: false, sort: 'artist' };
+    document.getElementById('search').value               = '';
+    document.getElementById('genre-filter').value         = '';
     document.getElementById('compilation-filter').checked = false;
+    document.getElementById('sort-select').value          = 'artist';
     resetAndLoad();
   });
 
