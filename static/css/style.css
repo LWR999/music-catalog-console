@@ -559,6 +559,13 @@ select.input {
 }
 .text-muted { color: var(--text-muted); }
 
+.nas-path {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
 /* Tracklist */
 .modal-tracks { padding: 0; }
 

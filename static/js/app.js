@@ -222,6 +222,7 @@ function renderModal({ album, tracks }) {
     row('Label',   album.label   ? esc(album.label)          : null),
     row('Catalog', album.catalog_number ? esc(album.catalog_number) : null),
     album.is_compilation ? row('Type', 'Compilation') : null,
+    album.nas_path ? row('Path', `<span class="nas-path">${esc(album.nas_path)}</span>`) : null,
   ].filter(Boolean).join('');
 
   // Group by disc
