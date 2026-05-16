@@ -223,6 +223,7 @@ function renderModal({ album, tracks }) {
     row('Catalog', album.catalog_number ? esc(album.catalog_number) : null),
     album.is_compilation ? row('Type', 'Compilation') : null,
     album.nas_path ? row('Path', `<span class="nas-path">${esc(album.nas_path)}</span>`) : null,
+    (album.mb_confidence && album.mb_confidence !== 'none') ? mbRows(album) : null,
   ].filter(Boolean).join('');
 
   // Group by disc
@@ -278,6 +279,20 @@ function renderModal({ album, tracks }) {
 function row(label, value) {
   if (!value) return null;
   return `<tr><th>${label}</th><td>${value}</td></tr>`;
+}
+
+function mbRows(album) {
+  const mbid = album.mb_release_id;
+  const badge = `<span class="badge-confidence badge-confidence--${album.mb_confidence}">${album.mb_confidence}</span>`;
+  const link  = `<a class="mb-link" href="https://musicbrainz.org/release/${mbid}" target="_blank" rel="noopener">${mbid}</a>`;
+  const parts = [
+    `<tr class="mb-section-header"><td colspan="2">MusicBrainz ${badge}</td></tr>`,
+    `<tr><th>MB Release</th><td>${link}</td></tr>`,
+    album.release_country ? `<tr><th>Country</th><td>${esc(album.release_country)}</td></tr>` : '',
+    album.release_year    ? `<tr><th>MB Year</th><td>${album.release_year}</td></tr>`          : '',
+    album.record_label    ? `<tr><th>MB Label</th><td>${esc(album.record_label)}</td></tr>`    : '',
+  ];
+  return parts.join('');
 }
 
 function closeModal() {

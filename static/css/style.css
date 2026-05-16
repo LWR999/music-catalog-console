@@ -566,6 +566,39 @@ select.input {
   word-break: break-all;
 }
 
+.mb-section-header td {
+  padding-top: 10px !important;
+  padding-bottom: 4px !important;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border) !important;
+}
+
+.badge-confidence {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+}
+.badge-confidence--exact { background: rgba(76,175,80,.2); color: #81c784; }
+.badge-confidence--fuzzy { background: rgba(255,152,0,.2); color: #ffb74d; }
+
+.mb-link {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 11px;
+  color: var(--accent);
+  text-decoration: none;
+  word-break: break-all;
+}
+.mb-link:hover { text-decoration: underline; }
+
 /* Tracklist */
 .modal-tracks { padding: 0; }
 

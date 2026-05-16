@@ -131,6 +131,8 @@ def album_detail(album_id):
             a.id, a.title, ar.name AS artist, a.year, a.original_year,
             f.name AS format, a.label, a.catalog_number, a.disc_count,
             a.is_compilation, a.nas_path,
+            a.mb_release_id, a.release_year, a.record_label,
+            a.release_country, a.mb_confidence,
             COALESCE(
                 (SELECT STRING_AGG(g.name, ', ' ORDER BY g.name)
                  FROM album_genres ag JOIN genres g ON g.id = ag.genre_id
