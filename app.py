@@ -15,6 +15,7 @@ app = Flask(__name__)
 SCRAPER_PYTHON = os.path.expanduser('~/development/music-catalog/venv/bin/python')
 SCRAPER_PATH = os.path.expanduser('~/development/music-catalog/scrape.py')
 SCRAPER_CWD = os.path.expanduser('~/development/music-catalog')
+SCRAPE_LOG = os.path.expanduser('~/development/music-catalog-console/scrape.log')
 
 
 def get_db():
@@ -209,20 +210,25 @@ def scrape(mode):
             cmd.append('--full')
 
         try:
-            proc = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
-                cwd=SCRAPER_CWD,
-            )
-            try:
-                for line in proc.stdout:
-                    yield f'data: {json.dumps(line.rstrip())}\n\n'
-            finally:
-                proc.wait()
+            with open(SCRAPE_LOG, 'w') as lf:
+                proc = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    cwd=SCRAPER_CWD,
+                )
+                try:
+                    for line in proc.stdout:
+                        lf.write(line)
+                        lf.flush()
+                        yield f'data: {json.dumps(line.rstrip())}\n\n'
+                finally:
+                    proc.wait()
 
-            yield f'data: {json.dumps(f"[DONE] Exit code: {proc.returncode}")}\n\n'
+                done_msg = f'[DONE] Exit code: {proc.returncode}'
+                lf.write(done_msg + '\n')
+                yield f'data: {json.dumps(done_msg)}\n\n'
         except Exception as exc:
             yield f'data: {json.dumps(f"[ERROR] {exc}")}\n\n'
 
