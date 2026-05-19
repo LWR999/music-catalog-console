@@ -1,0 +1,19 @@
+[Unit]
+Description=Music Catalog Console
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=dl
+WorkingDirectory=/home/dl/development/music-catalog-console
+EnvironmentFile=/home/dl/development/music-catalog-console/.env
+ExecStart=/home/dl/development/music-catalog-console/venv/bin/gunicorn \
+    --workers 2 \
+    --bind 0.0.0.0:5001 \
+    --timeout 120 \
+    app:app
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

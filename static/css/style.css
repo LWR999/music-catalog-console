@@ -292,7 +292,7 @@ select.input {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 10.5px;
   line-height: 1.5;
-  max-height: 280px;
+  max-height: 420px;
   overflow-y: auto;
   padding: 8px;
 }
