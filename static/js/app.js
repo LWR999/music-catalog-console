@@ -219,6 +219,8 @@ function renderModal({ album, tracks }) {
       : null),
     row('Genre',   album.genres || null),
     row('Format',  esc(album.format)),
+    row('Plays',   album.play_count > 0 ? album.play_count.toLocaleString() : null),
+    row('Size',    album.size_bytes ? formatBytes(album.size_bytes) : null),
     row('Label',   album.label   ? esc(album.label)          : null),
     row('Catalog', album.catalog_number ? esc(album.catalog_number) : null),
     album.is_compilation ? row('Type', 'Compilation') : null,
@@ -347,6 +349,50 @@ function startScrape(mode) {
   });
 }
 
+function startGenreNormalise() {
+  if (state.scrapeSource) {
+    state.scrapeSource.close();
+    state.scrapeSource = null;
+  }
+
+  const panel  = document.getElementById('scrape-panel');
+  const log    = document.getElementById('scrape-log');
+  const status = document.getElementById('scrape-status');
+  const btnFull  = document.getElementById('btn-full-scrape');
+  const btnIncr  = document.getElementById('btn-incremental-scrape');
+  const btnGenre = document.getElementById('btn-genre-normalise');
+
+  panel.classList.remove('hidden');
+  log.innerHTML = '';
+  status.textContent = 'Running genre normalise…';
+  btnFull.disabled = true;
+  btnIncr.disabled = true;
+  btnGenre.disabled = true;
+
+  const source = new EventSource('/api/genre-normalise');
+  state.scrapeSource = source;
+
+  source.addEventListener('message', e => {
+    const text = JSON.parse(e.data);
+    appendLogLine(log, text);
+  });
+
+  const finish = label => {
+    source.close();
+    state.scrapeSource = null;
+    status.textContent = label;
+    btnFull.disabled = false;
+    btnIncr.disabled = false;
+    btnGenre.disabled = false;
+  };
+
+  source.addEventListener('done', () => finish('Genre normalise complete.'));
+
+  source.addEventListener('error', () => {
+    if (source.readyState === EventSource.CLOSED) finish('Genre normalise ended.');
+  });
+}
+
 function appendLogLine(log, text) {
   const div = document.createElement('div');
   div.className = 'log-line';
@@ -366,6 +412,11 @@ function esc(str) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function formatBytes(bytes) {
+  if (bytes >= 1_000_000_000) return (bytes / 1_000_000_000).toFixed(1) + ' GB';
+  return Math.round(bytes / 1_000_000) + ' MB';
 }
 
 function formatDuration(secs) {
@@ -437,6 +488,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (confirm('Full rescrape will rebuild the entire catalog from scratch.\n\nContinue?')) {
       startScrape('full');
     }
+  });
+
+  // Genre normalise button
+  document.getElementById('btn-genre-normalise').addEventListener('click', () => {
+    startGenreNormalise();
   });
 
   // Close scrape log

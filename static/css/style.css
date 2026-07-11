@@ -241,6 +241,9 @@ select.input {
 .btn-danger { background: var(--danger); color: #fff; }
 .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
 
+.btn-secondary { background: var(--surface-3); color: var(--text); }
+.btn-secondary:hover:not(:disabled) { background: var(--surface-2); }
+
 .btn-ghost {
   background: var(--surface-3);
   color: var(--text-muted);

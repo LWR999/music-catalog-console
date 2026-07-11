@@ -17,6 +17,11 @@ SCRAPER_PATH = os.path.expanduser('~/development/music-catalog/scrape.py')
 SCRAPER_CWD = os.path.expanduser('~/development/music-catalog')
 SCRAPE_LOG = os.path.expanduser('~/development/music-catalog-console/scrape.log')
 
+GENRE_PYTHON = os.path.expanduser('~/development/music-catalog/venv/bin/python')
+GENRE_SCRIPT = os.path.expanduser('~/development/music-catalog/genre_normalise.py')
+GENRE_CWD    = os.path.expanduser('~/development/music-catalog')
+GENRE_LOG    = os.path.expanduser('~/development/music-catalog-console/genre_normalise.log')
+
 
 def get_db():
     if 'db' not in g:
@@ -65,6 +70,7 @@ def albums():
         'year_desc':'a.year DESC NULLS LAST, ar.sort_name, a.title',
         'year_asc': 'a.year ASC NULLS LAST, ar.sort_name, a.title',
         'added':    'a.last_scraped DESC NULLS LAST, ar.sort_name, a.title',
+        'play_count_desc': 'a.play_count DESC, ar.sort_name, a.title',
     }
     order_by = sort_map.get(sort, sort_map['artist'])
 
@@ -104,6 +110,7 @@ def albums():
             a.year,
             f.name   AS format,
             a.is_compilation,
+            a.play_count,
             EXISTS(
                 SELECT 1 FROM tracks t
                 WHERE t.album_id = a.id AND t.artwork IS NOT NULL
@@ -132,6 +139,8 @@ def album_detail(album_id):
             a.id, a.title, ar.name AS artist, a.year, a.original_year,
             f.name AS format, a.label, a.catalog_number, a.disc_count,
             a.is_compilation, a.nas_path,
+            a.play_count,
+            a.size_bytes,
             a.mb_release_id, a.release_year, a.record_label,
             a.release_country, a.mb_confidence,
             COALESCE(
@@ -217,6 +226,43 @@ def scrape(mode):
                     stderr=subprocess.STDOUT,
                     text=True,
                     cwd=SCRAPER_CWD,
+                )
+                try:
+                    for line in proc.stdout:
+                        lf.write(line)
+                        lf.flush()
+                        yield f'data: {json.dumps(line.rstrip())}\n\n'
+                finally:
+                    proc.wait()
+
+                done_msg = f'[DONE] Exit code: {proc.returncode}'
+                lf.write(done_msg + '\n')
+                yield f'data: {json.dumps(done_msg)}\n\n'
+        except Exception as exc:
+            yield f'data: {json.dumps(f"[ERROR] {exc}")}\n\n'
+
+        yield 'event: done\ndata: {}\n\n'
+
+    return Response(
+        stream_with_context(generate()),
+        content_type='text/event-stream',
+        headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'},
+    )
+
+
+@app.route('/api/genre-normalise')
+def genre_normalise():
+    def generate():
+        cmd = [GENRE_PYTHON, GENRE_SCRIPT]
+
+        try:
+            with open(GENRE_LOG, 'w') as lf:
+                proc = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    cwd=GENRE_CWD,
                 )
                 try:
                     for line in proc.stdout:

@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /home/dl/development/music-catalog-console status)",
+      "Bash(git -C /home/dl/development/music-catalog-console diff)",
+      "Bash(git -C /home/dl/development/music-catalog status)",
+      "Bash(git -C /home/dl/development/music-catalog diff)",
+      "Bash(git -C /home/dl/development/music-catalog-console log --oneline -5)",
+      "Bash(git -C /home/dl/development/music-catalog log --oneline -5)",
+      "Bash(git -C /home/dl/development/music-catalog-console add requirements.txt static/css/style.css music-catalog-console.service)",
+      "Bash(git -C /home/dl/development/music-catalog-console commit -m ' *)",
+      "Bash(git -C /home/dl/development/music-catalog add catalog/scraper.py)",
+      "Bash(git -C /home/dl/development/music-catalog commit -m ' *)",
+      "Bash(git -C /home/dl/development/music-catalog-console push)",
+      "Bash(git -C /home/dl/development/music-catalog push)",
+      "Bash(git -C /home/dl/development/music-catalog-console add app.py)",
+      "Read(//home/dl/flacflow/**)",
+      "Bash(systemctl --user status music-catalog-console)",
+      "Bash(sudo systemctl status music-catalog-console)",
+      "Bash(ssh *)",
+      "Bash(./venv/bin/python -m py_compile app.py)",
+      "Bash(node --check static/js/app.js)",
+      "Bash(systemctl list-units *)",
+      "Bash(systemctl status *)",
+      "Bash(systemctl list-unit-files *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
